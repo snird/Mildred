@@ -1,4 +1,0 @@
-markdown: redcarpet
-pygments: true
-redcarpet:
-  extensions: [with_toc_data]

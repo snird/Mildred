@@ -1,8 +1,8 @@
 {
-  "name": "chaplin",
-  "version": "0.11.1",
-  "description": "An Application Architecture Using Backbone.js",
-  "repository": "git://github.com/chaplinjs/chaplin.git",
+  "name": "mildred",
+  "version": "0.0.1",
+  "description": "An Application Architecture Using Backbone.js, forked from chaplinjs.",
+  "repository": "git://github.com/snird/chaplin.git",
   "devDependencies": {
     "grunt": "0.4.x",
     "grunt-contrib-coffee": "0.4.x",
@@ -14,14 +14,12 @@
     "grunt-bower-task": "0.3.x",
     "grunt-contrib-uglify": "0.2.x",
     "grunt-istanbul": "0.2.x",
-    "grunt-urequire": "git://github.com/concordusapps/grunt-urequire",
     "grunt-coffeelint": "0.0.x",
     "grunt-mocha": "0.2.x",
-    "grunt-transbrute": "~0.2.0",
     "prompt": "0.2.x",
     "phantomjs": "1.8.x"
   },
-  "main": "build/chaplin.js",
+  "main": "build/mildred.js",
   "scripts": {
     "install": "grunt clean build",
     "test": "grunt clean prepare test"

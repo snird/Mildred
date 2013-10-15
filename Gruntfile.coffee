@@ -13,27 +13,36 @@ module.exports = (grunt) ->
   # TODO: Remove this as soon as uRequire releases 0.3 which will able to
   #  do this for us in the right order magically.
   modules = [
-    'temp/chaplin/application.js'
-    'temp/chaplin/mediator.js'
-    'temp/chaplin/dispatcher.js'
-    'temp/chaplin/composer.js'
-    'temp/chaplin/controllers/controller.js'
-    'temp/chaplin/models/collection.js'
-    'temp/chaplin/models/model.js'
-    'temp/chaplin/views/layout.js'
-    'temp/chaplin/views/view.js'
-    'temp/chaplin/views/collection_view.js'
-    'temp/chaplin/lib/route.js'
-    'temp/chaplin/lib/router.js'
-    'temp/chaplin/lib/history.js'
-    'temp/chaplin/lib/delayer.js'
-    'temp/chaplin/lib/event_broker.js'
-    'temp/chaplin/lib/support.js'
-    'temp/chaplin/lib/composition.js'
-    'temp/chaplin/lib/sync_machine.js'
-    'temp/chaplin/lib/utils.js'
-    'temp/chaplin/lib/helpers.js'
-    'temp/chaplin.js'
+    'src/lib/support.coffee'
+    'src/application.coffee'
+    'src/dispatcher.coffee'
+    'src/composer.coffee'
+    'src/controllers/controller.coffee'
+    'src/models/collection.coffee'
+    'src/models/model.coffee'
+    'src/views/layout.coffee'
+    'src/views/view.coffee'
+    'src/views/collection_view.coffee'
+    'src/lib/route.coffee'
+    'src/lib/router.coffee'
+    'src/lib/history.coffee'
+    'src/lib/composition.coffee'
+    'src/lib/sync_machine.coffee'
+    'src/lib/utils.coffee'
+    'src/lib/helpers.coffee'
+  ]
+
+  test_modules = [
+    'application_spec'
+    'sync_machine_spec'
+    'view_spec'
+    'collection_view_spec'
+    'layout_spec'
+    'controller_spec'
+    # 'dispatcher_spec'- should rewrite the specs completely
+    'router_spec'
+    'model_spec'
+    'collection_spec'
   ]
 
   # Configuration
@@ -58,9 +67,9 @@ module.exports = (grunt) ->
       compile:
         files: [
           expand: true
-          dest: 'temp/'
-          cwd: 'src'
-          src: '**/*.coffee'
+          dest: 'build/'
+          cwd: 'temp'
+          src: '*.coffee'
           ext: '.js'
         ]
 
@@ -74,215 +83,28 @@ module.exports = (grunt) ->
         ]
 
       options:
-        bare: true
-
-    # Module conversion
-    # -----------------
-    urequire:
-      AMD:
-        bundlePath: 'temp/'
-        outputPath: 'temp/'
-
-        options:
-          forceOverwriteSources: true
-          relativeType: 'bundle'
-
-    # Publishing via Git
-    # ------------------
-    transbrute:
-      docs:
-        remote: 'git@github.com:chaplinjs/chaplin.git'
-        branch: 'gh-pages'
-        files: [
-          { expand: true, cwd: 'docs/', src: '**/*' }
-        ]
-      downloads:
-        message: "Release #{pkg.version}."
-        tag: pkg.version
-        tagMessage: "Version #{pkg.version}."
-        remote: 'git@github.com:chaplinjs/downloads.git'
-        branch: 'gh-pages'
-        files: [
-          { expand: true, cwd: 'build/', src: 'chaplin.{js,min.js}' },
-          {
-            dest: 'bower.json',
-            body: {
-              name: 'chaplin',
-              repo: 'chaplinjs/downloads',
-              version: pkg.version,
-              main: 'chaplin.js',
-              scripts: ['chaplin.js'],
-              dependencies: { backbone: '1.x' }
-            }
-          },
-          {
-            dest: 'component.json',
-            body: {
-              name: 'chaplin',
-              repo: 'chaplinjs/downloads',
-              version: pkg.version,
-              main: 'chaplin.js',
-              scripts: ['chaplin.js'],
-              dependencies: { 'components/backbone': '1.0.0' }
-            }
-          },
-          {
-            dest: 'package.json',
-            body: {
-              name: 'chaplin',
-              version: pkg.version,
-              description: 'Chaplin.js',
-              main: 'chaplin.js',
-              scripts: { test: 'echo "Error: no test specified" && exit 1' },
-              repository: {
-                type: 'git', url: 'git://github.com/chaplinjs/downloads.git'
-              },
-              author: 'Chaplin team',
-              license: 'MIT',
-              bugs: { url: 'https://github.com/chaplinjs/downloads/issues' },
-              dependencies: { backbone: '~1.0.0', underscore: '~1.5.1' }
-            }
-          }
-        ]
-
-    # Module naming
-    # -------------
-    # TODO: Remove this when uRequire hits 0.3
-    copy:
-      universal:
-        files: [
-          expand: true
-          dest: 'temp/'
-          cwd: 'temp'
-          src: '**/*.js'
-        ]
-
-        options:
-          processContent: (content, path) ->
-            name = ///temp/(.*)\.js///.exec(path)[1]
-            # data = content
-            data = content.replace /require\('/g, "loader('"
-            """
-            loader.register('#{name}', function(e, r, module) {
-            #{data}
-            });
-            """
-
-      amd:
-        files: [
-          expand: true
-          dest: 'temp/'
-          cwd: 'temp'
-          src: '**/*.js'
-        ]
-
-        options:
-          processContent: (content, path) ->
-            name = ///temp/(.*)\.js///.exec(path)[1]
-            content.replace ///define\(///, "define('#{name}',"
-
-      test:
-        files: [
-          expand: true
-          dest: 'test/temp/'
-          cwd: 'temp'
-          src: '**/*.js'
-        ]
-
-      beforeInstrument:
-        files: [
-          expand: true
-          dest: 'test/temp-original/'
-          cwd: 'test/temp'
-          src: '**/*.js'
-        ]
-
-      afterInstrument:
-        files: [
-          expand: true
-          dest: 'test/temp/'
-          cwd: 'test/temp-original'
-          src: '**/*.js'
-        ]
+        bare: false
 
     # Module concatenation
     # --------------------
-    # TODO: Remove this when uRequire hits 0.3
     concat:
       universal:
         files: [
-          dest: 'build/<%= pkg.name %>.js'
+          dest: 'temp/<%= pkg.name %>.coffee'
           src: modules
         ]
 
       options:
-        separator: ';'
-
         banner: '''
-        /*!
-         * Chaplin <%= pkg.version %>
-         *
-         * Chaplin may be freely distributed under the MIT license.
-         * For all details and documentation:
-         * http://chaplinjs.org
-         */
-
-        (function(){
-
-        var loader = (function() {
-          var modules = {};
-          var cache = {};
-
-          var dummy = function() {return function() {};};
-          var initModule = function(name, definition) {
-            var module = {id: name, exports: {}};
-            definition(module.exports, dummy(), module);
-            var exports = cache[name] = module.exports;
-            return exports;
-          };
-
-          var loader = function(path) {
-            if (cache.hasOwnProperty(path)) return cache[path];
-            if (modules.hasOwnProperty(path)) return initModule(path, modules[path]);
-            throw new Error('Cannot find module "' + path + '"');
-          };
-
-          loader.register = function(bundle, fn) {
-            modules[bundle] = fn;
-          };
-          return loader;
-        })();
-
+        window.Mildred = {}
 
         '''
-        footer: '''
 
-        var regDeps = function(Backbone, _) {
-          loader.register('backbone', function(exports, require, module) {
-            module.exports = Backbone;
-          });
-          loader.register('underscore', function(exports, require, module) {
-            module.exports = _;
-          });
-        };
-
-        if (typeof define === 'function' && define.amd) {
-          define(['backbone', 'underscore'], function(Backbone, _) {
-            regDeps(Backbone, _);
-            return loader('chaplin');
-          });
-        } else if (typeof module === 'object' && module && module.exports) {
-          regDeps(require('backbone'), require('underscore'));
-          module.exports = loader('chaplin');
-        } else if (typeof require === 'function') {
-          regDeps(window.Backbone, window._);
-          window.Chaplin = loader('chaplin');
-        } else {
-          throw new Error('Chaplin requires Common.js or AMD modules');
-        }
-
-        })();
-        '''
+      tests:
+        files: [
+          dest: 'test/tests.js'
+          src: test_modules
+        ]
 
     # Lint
     # ----
@@ -294,8 +116,7 @@ module.exports = (grunt) ->
     # ---------------
     instrument:
       files: [
-        'test/temp/chaplin.js'
-        'test/temp/chaplin/**/*.js'
+        'test/temp/mildred/*.js'
       ]
 
       options:
@@ -338,25 +159,23 @@ module.exports = (grunt) ->
         mangle: false
       universal:
         files:
-          'build/chaplin.min.js': 'build/chaplin.js'
+          'build/mildred.min.js': 'build/mildred.js'
 
     # Compression
     # -----------
     compress:
       files: [
-        src: 'build/chaplin.min.js'
-        dest: 'build/chaplin.min.js.gz'
+        src: 'build/mildred.min.js'
+        dest: 'build/mildred.min.js.gz'
       ]
 
     # Watching for changes
     # --------------------
     watch:
       coffee:
-        files: ['src/**/*.coffee']
+        files: ['src/*.coffee']
         tasks: [
           'coffee:compile'
-          'urequire'
-          'copy:amd'
           'copy:test'
           'mocha'
         ]
@@ -394,9 +213,8 @@ module.exports = (grunt) ->
   # -----
 
   grunt.registerTask 'build', [
-    'coffee:compile'
-    'copy:universal'
     'concat:universal'
+    'coffee:compile'
     'uglify'
   ]
 
@@ -408,10 +226,9 @@ module.exports = (grunt) ->
   # ----
   grunt.registerTask 'test', [
     'coffee:compile'
-    'urequire'
-    'copy:amd'
-    'copy:test'
+    'concat:universal'
     'coffee:test'
+    'concat:tests'
     'mocha'
   ]
 
@@ -419,8 +236,6 @@ module.exports = (grunt) ->
   # --------
   grunt.registerTask 'cover', [
     'coffee:compile'
-    'urequire'
-    'copy:amd'
     'copy:test'
     'coffee:test'
     'copy:beforeInstrument'
@@ -440,38 +255,6 @@ module.exports = (grunt) ->
 
   # Releasing
   # ---------
-
-  grunt.registerTask 'check:versions:component', 'Check that package.json and bower.json versions match', ->
-    componentVersion = grunt.file.readJSON('bower.json').version
-    unless componentVersion is pkg.version
-      grunt.fail.warn "bower.json is version #{componentVersion}, package.json is #{pkg.version}."
-    else
-      grunt.log.ok()
-
-  grunt.registerTask 'check:versions:changelog', 'Check that CHANGELOG.md is up to date', ->
-    # Require CHANGELOG.md to contain "Chaplin VERSION (DIGIT"
-    changelogMd = grunt.file.read('CHANGELOG.md')
-    unless RegExp("Chaplin #{pkg.version} \\(\\d").test changelogMd
-      grunt.fail.warn "CHANGELOG.md does not seem to be updated for #{pkg.version}."
-    else
-      grunt.log.ok()
-
-  grunt.registerTask 'check:versions:docs', 'Check that package.json and docs versions match', ->
-    template = grunt.file.read path.join('docs', '_layouts', 'default.html')
-    match = template.match /^version: ((\d+)\.(\d+)\.(\d+)(?:-[\dA-Za-z\-]*)?)$/m
-    unless match
-      grunt.fail.warn "Version missing in docs layout."
-    docsVersion = match[1]
-    unless docsVersion is pkg.version
-      grunt.fail.warn "Docs layout is version #{docsVersion}, package.json is #{pkg.version}."
-    else
-      grunt.log.ok()
-
-  grunt.registerTask 'check:versions', [
-    'check:versions:component',
-    'check:versions:changelog',
-    'check:versions:docs'
-  ]
 
   grunt.registerTask 'release:git', 'Check context, commit and tag for release.', ->
     prompt = require 'prompt'
@@ -535,13 +318,7 @@ module.exports = (grunt) ->
     'check:versions',
     'release:git',
     'build',
-    'transbrute:docs',
-    'transbrute:downloads'
   ]
-
-  # Publish Documentation
-  # ---------------------
-  grunt.registerTask 'docs:publish', ['check:versions:docs', 'transbrute:docs']
 
   # Default
   # -------

@@ -1,66 +1,25 @@
-![Chaplin](http://s3.amazonaws.com/imgly_production/3401027/original.png)
+# Mildred - Application Architecture for Backbone.js
 
-[![Stories in Ready](https://badge.waffle.io/chaplinjs/chaplin.png?label=ready)](http://waffle.io/chaplinjs/chaplin)
-[![Build Status](https://travis-ci.org/chaplinjs/chaplin.png?branch=topics/backbone-options)](https://travis-ci.org/chaplinjs/chaplin)
+**Mildred** is a backbone.js application architecture forked from [ChaplinJS](http://chaplinjs.org/). the main goal of Mildred is to be a simpler to use Chaplin.js, with no AMD required and some fancy features left out.
 
-# An Application Architecture Using Backbone.js
+[![Build Status](https://travis-ci.org/snird/Mildred.png)](https://travis-ci.org/snird/Mildred)
 
-## Introduction
+For those who come from Chaplin.js background and experience here are the major differences:
 
-Chaplin is an architecture for JavaScript applications using the [Backbone.js](http://documentcloud.github.com/backbone/) library.
+*   No AMD required - the mildred.js file is standalone and full.
+*   Access to components is made by Mildred.Component, e.g: Mildred.Model, Mildred.Controller, Mildred.Layout etc'
+*   Mediator and event_broker are completely gone. use Backbone.js events instead, they are great and in my opinion the Mediator wrapper for them was redundant and causing confusion.
+*   Controllers - since no there is no AMD, and since reading the controllers by folder structure seems a bit restrictive to me, you should pass your controllers as an array to the Mildred.Application object as one of the options, called controllers.
+*   Controllers and Router - to make it easier to you, we parse the controller name automatically with "Controller" or "_Controller" sliced out, meaning: you have a controller name "IndexController", you should refer to the "show" method of this controller for example in the router as "Index#show". same goes for "ControllerIndex", "Index_Controller", "index_controller" and so on.
+*   No regions at all.
+*   Views - the noWrap functionality is gone.
+*   Templating - by default we assume using the underscore built in template render. you may give the application an application wide templating function, in the options to the Application object under the name "templateFunction", and as always, you can override it in the view by overriding the getTemplateFunction as it is in Chaplin.
 
-All information, commercial support contacts and examples are available at [chaplinjs.org](http://chaplinjs.org), comprehensive documentation and class reference can be found at [docs.chaplinjs.org](http://docs.chaplinjs.org).
+This sums it up for now, I hope to get a full documentation soon, but if you come from Chaplin experience you can get it work, or you can just follow Chaplin's documentation with this changes in mind.
 
-[Download the latest release on chaplinjs.org](http://chaplinjs.org/#downloads). See below on how to compile from source manually.
+## Build, Test, Contribute
 
-## Building Chaplin
-
-The Chaplin source files are originally written in the [CoffeeScript](http://coffeescript.org/) meta-language. However, the Chaplin library file is a compiled JavaScript file which defines the `chaplin` module.
-
-Our build script compiles the CoffeeScripts and bundles them into one file. To run the script, follow these steps:
-
-1. Download and install [Node.js](http://nodejs.org/).
-2. Open a shell (aka terminal aka command prompt) and type in the commands in the following steps.
-3. Install the Node package for the grunt command line interface globally.
-
-   ```sh
-   sudo npm install -g grunt-cli
-   ```
-
-   On Windows, you can omit the `sudo` command at the beginning.
-
-4. Change into the Chaplin root directory.
-5. Start the build (will install dependencies and build).
-
-   ```
-   npm install
-   ```
-
-This creates these files in `build` dir:
-
-* `chaplin.js` – The library as a compiled JavaScript file.
-* `chaplin.min.js` – Minified. For production use you should pick this.
-
-## Running the Tests
-
-Chaplin aims to be fully unit-tested. At the moment most of the modules are covered by Mocha tests.
-
-How to run the tests:
-
-1. Follow the steps for [building chaplin](#building-chaplin).
-2. Open a shell (aka terminal aka command prompt) and type in the commands in the following steps.
-3. Change into the Chaplin root directory.
-4. Start the test runner.
-
-   ```
-   npm test
-   ```
-
-Note that you can now additionally open `test/index.html` to run the tests in your browser (instead of in node).
-Furthermore code coverage reports are generated and may be viewed by opening `test/coverage/index.html` in your browser.
-
-![Ending](http://s3.amazonaws.com/imgly_production/3362023/original.jpg)
-
-## [The Cast](https://github.com/chaplinjs/chaplin/blob/master/AUTHORS.md#the-cast)
-
-## [The Producers](https://github.com/chaplinjs/chaplin/blob/master/AUTHORS.md#the-producers)
+1. `sudo npm install -g grunt-cli`
+2. `cd mildred && npm install && npm build`
+3. `npm test` or `open test/index.html`
+4. `grunt watch`
