@@ -22,7 +22,7 @@ Mildred.utils =
     else if _.indexOf
       _.indexOf
 
-# Simple duck-typing serializer for models and collections.
+  # Simple duck-typing serializer for models and collections.
   serialize: (data) ->
     if typeof data.serialize is 'function'
       data.serialize()

@@ -14,35 +14,35 @@ module.exports = (grunt) ->
   #  do this for us in the right order magically.
   modules = [
     'src/lib/support.coffee'
-    'src/application.coffee'
-    'src/dispatcher.coffee'
-    'src/composer.coffee'
-    'src/controllers/controller.coffee'
-    'src/models/collection.coffee'
-    'src/models/model.coffee'
-    'src/views/layout.coffee'
-    'src/views/view.coffee'
-    'src/views/collection_view.coffee'
-    'src/lib/route.coffee'
-    'src/lib/router.coffee'
-    'src/lib/history.coffee'
-    'src/lib/composition.coffee'
-    'src/lib/sync_machine.coffee'
     'src/lib/utils.coffee'
     'src/lib/helpers.coffee'
+    'src/lib/history.coffee'
+    'src/lib/route.coffee'
+    'src/lib/router.coffee'
+    'src/lib/composition.coffee'
+    'src/lib/sync_machine.coffee'
+    'src/controllers/controller.coffee'
+    'src/models/model.coffee'
+    'src/models/collection.coffee'
+    'src/views/view.coffee'
+    'src/views/layout.coffee'
+    'src/views/collection_view.coffee'
+    'src/dispatcher.coffee'
+    'src/composer.coffee'
+    'src/application.coffee'
   ]
 
   test_modules = [
-    'application_spec'
-    'sync_machine_spec'
-    'view_spec'
-    'collection_view_spec'
-    'layout_spec'
-    'controller_spec'
-    # 'dispatcher_spec'- should rewrite the specs completely
-    'router_spec'
-    'model_spec'
-    'collection_spec'
+    'test/spec/application_spec.coffee'
+    'test/spec/model_spec.coffee'
+    'test/spec/collection_spec.coffee'
+    'test/spec/sync_machine_spec.coffee'
+    'test/spec/view_spec.coffee'
+    'test/spec/collection_view_spec.coffee'
+    'test/spec/layout_spec.coffee'
+    'test/spec/controller_spec.coffee'
+    # 'test/spec/dispatcher_spec.coffee'- should rewrite the specs completely
+    'test/spec/router_spec.coffee'
   ]
 
   # Configuration
@@ -76,8 +76,8 @@ module.exports = (grunt) ->
       test:
         files: [
           expand: true
-          dest: 'test/temp/'
-          cwd: 'test/spec'
+          dest: 'test/'
+          cwd: 'test/temp'
           src: '**/*.coffee'
           ext: '.js'
         ]
@@ -94,15 +94,15 @@ module.exports = (grunt) ->
           src: modules
         ]
 
-      options:
-        banner: '''
-        window.Mildred = {}
+        options:
+          banner: '''
+          window.Mildred = {}
 
-        '''
+          '''
 
       tests:
         files: [
-          dest: 'test/tests.js'
+          dest: 'test/temp/tests.coffee'
           src: test_modules
         ]
 
@@ -225,10 +225,10 @@ module.exports = (grunt) ->
   # Test
   # ----
   grunt.registerTask 'test', [
-    'coffee:compile'
     'concat:universal'
-    'coffee:test'
+    'coffee:compile'
     'concat:tests'
+    'coffee:test'
     'mocha'
   ]
 

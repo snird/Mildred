@@ -1,9 +1,10 @@
 # Private helper function for serializing attributes recursively,
+# Private helper function for serializing attributes recursively,
 # creating objects which delegate to the original attributes
 # in order to protect them from changes.
 serializeAttributes = (model, attributes, modelStack) ->
 	# Create a delegator object.
-	delegator = utils.beget attributes
+	delegator = Mildred.utils.beget attributes
 
 	# Add model to stack.
 	modelStack ?= {}

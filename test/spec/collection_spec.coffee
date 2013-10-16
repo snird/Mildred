@@ -1,101 +1,85 @@
-define [
-  'underscore'
-  'backbone'
-  'chaplin/mediator'
-  'chaplin/models/collection'
-  'chaplin/models/model'
-  'chaplin/lib/event_broker'
-], (_, Backbone, mediator, Collection, Model, EventBroker) ->
-  'use strict'
+describe 'Collection', ->
+  collection = null
 
-  describe 'Collection', ->
-    collection = null
+  beforeEach ->
+    collection = new Mildred.Collection
 
-    beforeEach ->
-      collection = new Collection
+  afterEach ->
+    collection.dispose()
 
-    afterEach ->
+  expectOrder = (order) ->
+    for id, index in order
+      expect(collection.at(index).id).to.be id
+
+  it 'should serialize the models', ->
+    model1 = new Mildred.Model id: 1, foo: 'foo'
+    model2 = new Backbone.Model id: 2, bar: 'bar'
+    collection = new Mildred.Collection [model1, model2]
+    expect(collection.serialize).to.be.a 'function'
+
+    actual = collection.serialize()
+    expected = [
+      {id: 1, foo: 'foo'}
+      {id: 2, bar: 'bar'}
+    ]
+
+    expect(actual.length).to.be expected.length
+
+    expect(actual[0]).to.be.an 'object'
+    expect(actual[0].id).to.be expected[0].id
+    expect(actual[0].foo).to.be expected[0].foo
+
+    expect(actual[1]).to.be.an 'object'
+    expect(actual[1].id).to.be expected[1].id
+    expect(actual[1].foo).to.be expected[1].foo
+
+  describe 'Disposal', ->
+    it 'should dispose itself correctly', ->
+      expect(collection.dispose).to.be.a 'function'
       collection.dispose()
 
-    expectOrder = (order) ->
-      for id, index in order
-        expect(collection.at(index).id).to.be id
+      expect(collection.length).to.be 0
 
-    it 'should mixin a EventBroker', ->
-      for own name, value of EventBroker
-        expect(collection[name]).to.be EventBroker[name]
+      expect(collection.disposed).to.be true
 
-    it 'should serialize the models', ->
-      model1 = new Model id: 1, foo: 'foo'
-      model2 = new Backbone.Model id: 2, bar: 'bar'
-      collection = new Collection [model1, model2]
-      expect(collection.serialize).to.be.a 'function'
+    it 'should fire a dispose event', ->
+      disposeSpy = sinon.spy()
+      collection.on 'dispose', disposeSpy
 
-      actual = collection.serialize()
-      expected = [
-        {id: 1, foo: 'foo'}
-        {id: 2, bar: 'bar'}
-      ]
+      collection.dispose()
 
-      expect(actual.length).to.be expected.length
+      expect(disposeSpy).was.called()
 
-      expect(actual[0]).to.be.an 'object'
-      expect(actual[0].id).to.be expected[0].id
-      expect(actual[0].foo).to.be expected[0].foo
+    it 'should unsubscribe from Pub/Sub events', ->
+      pubSubSpy = sinon.spy()
+      collection.on 'foo', pubSubSpy
 
-      expect(actual[1]).to.be.an 'object'
-      expect(actual[1].id).to.be expected[1].id
-      expect(actual[1].foo).to.be expected[1].foo
+      collection.dispose()
 
-    describe 'Disposal', ->
-      it 'should dispose itself correctly', ->
-        expect(collection.dispose).to.be.a 'function'
-        collection.dispose()
+      collection.trigger 'foo'
+      expect(pubSubSpy).was.notCalled()
 
-        expect(collection.length).to.be 0
+    it 'should remove all event handlers from itself', ->
+      collectionBindSpy = sinon.spy()
+      collection.on 'foo', collectionBindSpy
 
-        expect(collection.disposed).to.be true
-        if Object.isFrozen
-          expect(Object.isFrozen(collection)).to.be true
+      collection.dispose()
 
-      it 'should fire a dispose event', ->
-        disposeSpy = sinon.spy()
-        collection.on 'dispose', disposeSpy
+      collection.trigger 'foo'
+      expect(collectionBindSpy).was.notCalled()
 
-        collection.dispose()
+    it 'should unsubscribe from other events', ->
+      spy = sinon.spy()
+      model = new Mildred.Model
+      collection.listenTo model, 'foo', spy
 
-        expect(disposeSpy).was.called()
+      collection.dispose()
 
-      it 'should unsubscribe from Pub/Sub events', ->
-        pubSubSpy = sinon.spy()
-        collection.subscribeEvent 'foo', pubSubSpy
+      model.trigger 'foo'
+      expect(spy).was.notCalled()
 
-        collection.dispose()
+    it 'should remove instance properties', ->
+      collection.dispose()
 
-        mediator.publish 'foo'
-        expect(pubSubSpy).was.notCalled()
-
-      it 'should remove all event handlers from itself', ->
-        collectionBindSpy = sinon.spy()
-        collection.on 'foo', collectionBindSpy
-
-        collection.dispose()
-
-        collection.trigger 'foo'
-        expect(collectionBindSpy).was.notCalled()
-
-      it 'should unsubscribe from other events', ->
-        spy = sinon.spy()
-        model = new Model
-        collection.listenTo model, 'foo', spy
-
-        collection.dispose()
-
-        model.trigger 'foo'
-        expect(spy).was.notCalled()
-
-      it 'should remove instance properties', ->
-        collection.dispose()
-
-        for prop in ['model', 'models', '_byId', '_byCid']
-          expect(collection).not.to.have.own.property prop
+      for prop in ['model', 'models', '_byId', '_byCid']
+        expect(collection).not.to.have.own.property prop
