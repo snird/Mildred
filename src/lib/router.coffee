@@ -70,7 +70,7 @@ class Mildred.Router
   # and passes the routing options to the callback function.
   route: (pathDesc, params, options) ->
     params = if params
-      if utils.isArray(params) then params.slice() else _.extend {}, params
+      if _.isArray(params) then params.slice() else _.extend {}, params
     else
       {}
 
