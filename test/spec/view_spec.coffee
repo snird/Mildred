@@ -14,8 +14,7 @@ describe 'View', ->
     initialize: ->
       super
 
-    getTemplateFunction: ->
-      -> template
+    template: template
 
     # Overrides render
     render: ->
@@ -68,9 +67,6 @@ describe 'View', ->
     expect(renderCalled).to.be true
     # should not be in the DOM
     expect(view.$el.parent().length).to.be 0
-
-  it 'should not render without proper getTemplateFunction', ->
-    expect(-> new Mildred.View autoRender: true).to.throwError()
 
   it 'should attach itself to an element automatically', ->
     view = new TestView container: testbed

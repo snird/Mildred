@@ -306,15 +306,16 @@ class Mildred.View extends Backbone.View
     # removed correctly).
     return false if @disposed
 
+    templateFunc = @getTemplateFunction()
+
     # populate the template function with the view template string
-    templateFunc = @getTemplateFunction @template
+    templateRender = templateFunc @template
 
-    if typeof templateFunc is 'function'
-      # Call the template function passing the template data.
-      html = templateFunc @getTemplateData()
+    # Call the template function passing the template data.
+    html = templateRender @getTemplateData()
 
-      # Replace HTML
-      @$el.html html
+    # Replace HTML
+    @$el.html html
 
     # Return the view.
     this

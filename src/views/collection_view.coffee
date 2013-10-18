@@ -124,10 +124,6 @@ class Mildred.CollectionView extends Mildred.View
 
     templateData
 
-  # In contrast to normal views, a template is not mandatory
-  # for CollectionViews. Provide an empty `getTemplateFunction`.
-  getTemplateFunction: ->
-
   # Main render method (should be called only once)
   render: ->
     super
