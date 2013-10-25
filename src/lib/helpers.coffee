@@ -1,4 +1,4 @@
-helpers =
+Mildred.helpers =
 # Routing Helpers
 # ---------------
 
