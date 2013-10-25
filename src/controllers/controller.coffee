@@ -39,7 +39,7 @@ class Mildred.Controller
   # Redirect to URL.
   redirectTo: (pathDesc, params, options) ->
     @redirected = true
-    helpers.redirectTo pathDesc, params, options
+    Mildred.helpers.redirectTo pathDesc, params, options
 
   # Disposal
   # --------

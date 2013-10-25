@@ -102,7 +102,7 @@ class Mildred.Layout extends Mildred.View
       return
 
     # Pass to the router, try to route the path internally.
-    helpers.redirectTo url: href
+    Mildred.helpers.redirectTo url: href
 
     # Prevent default handling if the URL could be routed.
     event.preventDefault()
