@@ -75,6 +75,7 @@ class Mildred.Dispatcher
 
       if cont_name == name.toUpperCase()
         return controller
+    throw new Error "Dispatcher#getControllerByName: There is no controller named #{name}. Make sure you spelled it right and you pass the controllers array to the App initialize properly."
 
   runController: (controller, route, params, options) ->
     @previousRoute = @currentRoute
