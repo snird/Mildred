@@ -59,21 +59,32 @@ class Mildred.Dispatcher
       controller = @getControllerByName(route.controller)
       @runController controller, route, params, options
 
-  # gets the proper controller from the controllers list
-  # by the name provided at the router match
-  getControllerByName: (name) ->
-    for controller in @controllers
-      # clean up the "Controller" string from the name
-      controller_string_place = controller.name.toUpperCase().indexOf("CONTROLLER")
-      if controller_string_place > -1
-        if controller.name.toUpperCase().indexOf("_CONTROLLER") > -1
-          cont_name = controller.name.toUpperCase().slice(0, -11)
-        else
-          cont_name = controller.name.toUpperCase().slice(0, -10)
+  getControllerNameStrip: (name) ->
+    # gets a controller name and strip the "Controller" from it as name_Controller or nameController etc'
+    # clean up the "Controller" string from the name
+    cont_name = name.toUpperCase()
+    controller_string_place = cont_name.indexOf("CONTROLLER")
+    if controller_string_place > -1
+      if name.toUpperCase().indexOf("_CONTROLLER") > -1
+        cont_name = name.toUpperCase().slice(0, -11)
       else
-        cont_name = controller.name.toUpperCase()
+        cont_name = name.toUpperCase().slice(0, -10)
+    else
+      cont_name = name.toUpperCase()
+    return cont_name
 
-      if cont_name == name.toUpperCase()
+  getControllerByName: (name) ->
+    # gets the proper controller from the controllers list
+    # by the name provided at the router match
+    if _.isArray @controllers
+      controllers = @controllers
+    else if typeof @controllers is 'object'
+      controllers = _.values @controllers
+    else
+      throw new Error "Dispacher#getControllerByName: the 'controllers' option delivered to the app initialize must be an array or an object."
+
+    for controller in controllers
+      if @getControllerNameStrip(controller.name) == name.toUpperCase()
         return controller
     throw new Error "Dispatcher#getControllerByName: There is no controller named #{name}. Make sure you spelled it right and you pass the controllers array to the App initialize properly."
 
