@@ -213,7 +213,7 @@ describe 'View', ->
   it 'should correct inheritance of events object', (done) ->
     class A extends TestView
       autoRender: yes
-      getTemplateFunction: -> -> '
+      template: '
               <div id="a"></div>
               <div id="b"></div>
               <div id="c"></div>
