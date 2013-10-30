@@ -51,6 +51,7 @@ some more differences to be well documented:
 *   Mediator and event_broker are completely gone. use Backbone.js events instead, they are great and in my opinion the Mediator wrapper for them was redundant and causing confusion.
 *   No regions at all.
 *   Views - the noWrap functionality is gone.
+*   Views - TemplateFunc is default to _.template unless specifically changed
 *   Templating - by default we assume using the underscore built in template render. you may give the application an application wide templating function, in the options to the Application object under the name "templateFunction", and as always, you can override it in the view by overriding the getTemplateFunction as it is in Chaplin.
 
 This sums it up for now, I hope to get a full documentation soon, but if you come from Chaplin experience you can get it work, or you can just follow Chaplin's documentation with this changes in mind.
