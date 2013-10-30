@@ -15,7 +15,8 @@ Mildred handle this differently, your Controllers may live wherever you want the
 
 In the Application intialization you should give the app an option called 'controllers' with your controllers, either as an object or as an array.
 e.g:
-'''lang=coffeescript
+
+```CoffeeScript
 class MyApp extends Mildred.Application
   title: "example"
 
@@ -23,14 +24,14 @@ class MyApp extends Mildred.Application
 new MyApp
   routes: routes_var
   controllers: [MainController, AnotherController, name_controller, also_Controller, justname]
-'''
+```
 
 as you can see, Mildred accepts all sort of naming conventions: "nameController", "name_controller", "name_Controller" etc' or just a name without "controller" in it.
 that's it so you can use the name on your routes without the ending "controller", as you can in Chaplin.
 
 The object paradigm is useful when you would like to keep your app logic under some namespace and all your controllers are under some Object already.
 e.g:
-'''lang=coffeescript
+```CoffeeScript
 class MyApp.Controllers.Main extends Mildred.Controller
   # logic here
 
@@ -41,7 +42,7 @@ class MyApp.Controllers.AnotherController extends Mildred.Controller
 new MyApp
   routes: routes_var
   controllers: MyApp.Controllers
-'''
+```
 
 
 some more differences to be well documented:
