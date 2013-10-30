@@ -4,13 +4,50 @@
 
 [![Build Status](https://travis-ci.org/snird/Mildred.png)](https://travis-ci.org/snird/Mildred)
 
-For those who come from Chaplin.js background and experience here are the major differences:
+## Changes from ChaplinJS
+### non-amd
+Mildred most important feature is that it's written as non-amd ready library, it lives in the namespace under Mildred.XXX.
 
-*   No AMD required - the mildred.js file is standalone and full.
+### Controllers And Dispatcher
+Since Mildred is non-amd fork, The dispatcher logic and the Controllers workflow changed a lot.
+In ChaplinJS the Dispatcher loads the controller using the AMD module provided, so the controllers are restricted to be at a specific directory with specific names.
+Mildred handle this differently, your Controllers may live wherever you want them to be as long as you give them to Mildred as an Array or an Object.
+
+In the Application intialization you should give the app an option called 'controllers' with your controllers, either as an object or as an array.
+e.g:
+'lang=coffeescript
+class MyApp extends Mildred.Application
+  title: "example"
+
+# The initialization
+new MyApp
+  routes: routes_var
+  controllers: [MainController, AnotherController, name_controller, also_Controller, justname]
+'
+
+as you can see, Mildred accepts all sort of naming conventions: "nameController", "name_controller", "name_Controller" etc' or just a name without "controller" in it.
+that's it so you can use the name on your routes without the ending "controller", as you can in Chaplin.
+
+The object paradigm is useful when you would like to keep your app logic under some namespace and all your controllers are under some Object already.
+e.g:
+'lang=coffeescript
+class MyApp.Controllers.Main extends Mildred.Controller
+  # logic here
+
+class MyApp.Controllers.AnotherController extends Mildred.Controller
+  # logic here
+
+# The initialization
+new MyApp
+  routes: routes_var
+  controllers: MyApp.Controllers
+'
+
+
+some more differences to be well documented:
+
 *   Access to components is made by Mildred.Component, e.g: Mildred.Model, Mildred.Controller, Mildred.Layout etc'
 *   Mediator and event_broker are completely gone. use Backbone.js events instead, they are great and in my opinion the Mediator wrapper for them was redundant and causing confusion.
-*   Controllers - since no there is no AMD, and since reading the controllers by folder structure seems a bit restrictive to me, you should pass your controllers as an array to the Mildred.Application object as one of the options, called controllers.
-*   Controllers and Router - to make it easier to you, we parse the controller name automatically with "Controller" or "_Controller" sliced out, meaning: you have a controller name "IndexController", you should refer to the "show" method of this controller for example in the router as "Index#show". same goes for "ControllerIndex", "Index_Controller", "index_controller" and so on.
 *   No regions at all.
 *   Views - the noWrap functionality is gone.
 *   Templating - by default we assume using the underscore built in template render. you may give the application an application wide templating function, in the options to the Application object under the name "templateFunction", and as always, you can override it in the view by overriding the getTemplateFunction as it is in Chaplin.
