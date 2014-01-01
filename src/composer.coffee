@@ -153,7 +153,7 @@ class Mildred.Composer
     @off
 
     # Dispose of all compositions and their items (that can be)
-    composition.dispose() for name, composition of @compositions
+    Mildred.Composition.dispose() for name, composition of @compositions
 
     # Remove properties
     delete @compositions
