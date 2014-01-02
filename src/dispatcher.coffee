@@ -89,10 +89,13 @@ class Mildred.Dispatcher
     throw new Error "Dispatcher#getControllerByName: There is no controller named #{name}. Make sure you spelled it right and you pass the controllers array to the App initialize properly."
 
   runController: (controller, route, params, options) ->
-    @previousRoute = @currentRoute
-    @currentRoute = _.extend {}, route, {previous: Mildred.utils.beget(@previousRoute)}
-    controller = new controller params, route, options
-    @executeBeforeAction controller, route, params, options
+    @nextPreviousRoute = @currentRoute
+    previous = _.extend {}, @nextPreviousRoute
+    previous.params = @currentParams if @currentParams?
+    delete previous.previous if previous.previous
+    @nextCurrentRoute = _.extend {}, route, {previous}
+    controller = new controller params, @nextCurrentRoute, options
+    @executeBeforeAction controller, @nextCurrentRoute, params, options
 
   # Executes controller action.
   executeAction: (controller, route, params, options) ->

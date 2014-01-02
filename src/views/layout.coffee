@@ -15,12 +15,15 @@ class Mildred.Layout extends Mildred.View
 
   constructor: (options = {}) ->
     @title = options.title
+    @router = options.router
+    @dispatcher = options.dispatcher
     @settings = _.defaults options,
       titleTemplate: _.template(
         "<% if (subtitle) { %><%= subtitle %> \u2013 <% } %><%= title %>"
       )
       openExternalToBlank: false
       routeLinks: 'a, .go-to'
+      inControllerLink: '.in-controller'
       skipRouting: '.noscript'
     # Per default, jump to the top of the page.
       scrollTo: [0, 0]
@@ -31,6 +34,9 @@ class Mildred.Layout extends Mildred.View
 
     # Set the app link routing.
     @startLinkRouting() if @settings.routeLinks
+
+    # Set in controller link routing
+    @startInControllerRouting() if @settings.inControllerLink
 
   # Controller startup and disposal
   # -------------------------------
@@ -52,6 +58,9 @@ class Mildred.Layout extends Mildred.View
 
   # Automatic routing of internal links
   # -----------------------------------
+  startInControllerRouting: ->
+    route = @settings.inControllerLink
+    @$el.on 'click', route, @openInControllerLink if route
 
   startLinkRouting: ->
     route = @settings.routeLinks
@@ -74,6 +83,8 @@ class Mildred.Layout extends Mildred.View
     el = event.currentTarget
     $el = $(el)
     isAnchor = el.nodeName is 'A'
+
+    return if $el.hasClass('in-controller') # Stop if it's an in-controller link.
 
     # Get the href and perform checks on it.
     href = $el.attr('href') or $el.data('href') or null
@@ -107,6 +118,33 @@ class Mildred.Layout extends Mildred.View
     # Prevent default handling if the URL could be routed.
     event.preventDefault()
     return
+
+  # Skips the router action and runs the appropriate controller action without any reload.
+  # TODO: add tests and exceptions to data
+  # TODO: write documentation
+  openInControllerLink: (event) =>
+    # Prevent the default link behavior
+    event.preventDefault()
+    el = event.currentTarget
+    $el = $(el)
+
+    # Clear the new view container
+    stage = $($el.attr('stage'))
+    stage.html('')
+
+    # Gets the controller, action and params data
+    action = $el.attr('action')
+    params = $el.attr('params') || null
+
+    # To Invoke the function I need to split it's name by '.' for namespaces.
+    # see explanation here: http://stackoverflow.com/questions/359788/how-to-execute-a-javascript-function-when-i-have-its-name-as-a-string
+    @dispatcher.currentController[action].apply(this, params);
+
+    # Change the URI according to the 'href' value
+    href = $el.attr('href')
+    @router.changeURL href
+
+    return false
 
   # Disposal
   # --------

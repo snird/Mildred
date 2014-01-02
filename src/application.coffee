@@ -67,6 +67,9 @@ class Mildred.Application
 
   initLayout: (options = {}) ->
     options.title ?= @title
+    # Give layout the router and dispacher to handle in-controller links.
+    options.router = @router
+    options.dispatcher = @dispatcher
     @layout = new Mildred.Layout options
 
   initComposer: (options = {}) ->
@@ -108,6 +111,5 @@ class Mildred.Application
     properties = ['dispatcher', 'layout', 'router', 'composer']
     for prop in properties when this[prop]?
       this[prop].dispose()
-      delete this[prop]
 
     @disposed = true
