@@ -35,8 +35,8 @@ class Mildred.Dispatcher
   #
   dispatch: (route, params, options) ->
     # Clone params and options so the original objects remain untouched.
-    params = if params then _.clone(params) else {}
-    options = if options then _.clone(options) else {}
+    params = if params then _.extend {}, params else {}
+    options = if options then _.extend {}, options else {}
 
     # Whether to update the URL after controller startup.
     # Default to true unless explicitly set to false.
@@ -50,9 +50,9 @@ class Mildred.Dispatcher
     # Stop if the desired controller/action is already active
     # with the same params.
     return if not options.forceStartup and
-    @currentRoute?.controller is route.controller and
-    @currentRoute?.action is route.action and
-    _.isEqual @currentParams, params
+      @currentRoute?.controller is route.controller and
+      @currentRoute?.action is route.action and
+      _.isEqual(@currentParams, params)
 
     # Fetch the new controller, if any, then go on.
     if @controllers?
@@ -91,8 +91,8 @@ class Mildred.Dispatcher
   runController: (controller, route, params, options) ->
     @previousRoute = @currentRoute
     @currentRoute = _.extend {}, route, {previous: Mildred.utils.beget(@previousRoute)}
-    controller = new controller params, @currentRoute, options
-    @executeBeforeAction controller, @currentRoute, params, options
+    controller = new controller params, route, options
+    @executeBeforeAction controller, route, params, options
 
   # Executes controller action.
   executeAction: (controller, route, params, options) ->
@@ -126,9 +126,13 @@ class Mildred.Dispatcher
     before = controller.beforeAction
 
     executeAction = =>
-      if controller.redirected or @currentRoute and route isnt @currentRoute
+      if controller.redirected or @currentRoute and route is @currentRoute
+        @nextPreviousRoute = @nextCurrentRoute = null
         controller.dispose()
         return
+      @previousRoute = @nextPreviousRoute
+      @currentRoute = @nextCurrentRoute
+      @nextPreviousRoute = @nextCurrentRoute = null
       @executeAction controller, route, params, options
 
     unless before
@@ -138,7 +142,7 @@ class Mildred.Dispatcher
     # Throw deprecation warning.
     if typeof before isnt 'function'
       throw new TypeError 'Controller#beforeAction: function expected. ' +
-      'Old object-like form is not supported.'
+        'Old object-like form is not supported.'
 
     # Execute action in controller context.
     promise = controller.beforeAction params, route, options
