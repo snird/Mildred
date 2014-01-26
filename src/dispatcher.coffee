@@ -74,18 +74,12 @@ class Mildred.Dispatcher
     return cont_name
 
   getControllerByName: (name) ->
-    # gets the proper controller from the controllers list
-    # by the name provided at the router match
-    if _.isArray @controllers
-      controllers = @controllers
-    else if typeof @controllers is 'object'
-      controllers = _.values @controllers
-    else
-      throw new Error "Dispacher#getControllerByName: the 'controllers' option delivered to the app initialize must be an array or an object."
+    if typeof @controllers isnt 'object'
+      throw new Error "Dispacher#getControllerByName: the 'controllers' option delivered to the app initialize must be an object."
 
-    for controller in controllers
-      if @getControllerNameStrip(controller.name) == name.toUpperCase()
-        return controller
+    for controller_name, controller_function of @controllers
+      if @getControllerNameStrip(controller_name) == name.toUpperCase()
+        return controller_function
     throw new Error "Dispatcher#getControllerByName: There is no controller named #{name}. Make sure you spelled it right and you pass the controllers array to the App initialize properly."
 
   runController: (controller, route, params, options) ->
