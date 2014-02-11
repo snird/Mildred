@@ -22,7 +22,7 @@ class Mildred.Layout extends Mildred.View
         "<% if (subtitle) { %><%= subtitle %> \u2013 <% } %><%= title %>"
       )
       openExternalToBlank: false
-      routeLinks: 'a, .go-to'
+      routeLinks: 'a.go-to'
       inControllerLink: '.in-controller'
       skipRouting: '.noscript'
     # Per default, jump to the top of the page.
