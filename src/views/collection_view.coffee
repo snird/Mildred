@@ -110,6 +110,8 @@ class Mildred.CollectionView extends Mildred.View
     @listenTo @collection, 'add', @itemAdded
     @listenTo @collection, 'remove', @itemRemoved
     @listenTo @collection, 'reset sort', @itemsReset
+    for model in @collection.models
+      @listenTo model, 'change', @itemChanged
 
   # Rendering
   # ---------
@@ -151,6 +153,10 @@ class Mildred.CollectionView extends Mildred.View
   # When all items are resetted, render all anew.
   itemsReset: =>
     @renderAllItems()
+
+  # When an item is updated, re-render it's view
+  itemChanged: (item) =>
+    @updateItemView item
 
   # Fallback message when the collection is empty
   # ---------------------------------------------
@@ -266,6 +272,17 @@ class Mildred.CollectionView extends Mildred.View
   # Item view rendering
   # -------------------
 
+  # Updates a specific item view.
+  updateItemView: (item) =>
+    enableAnimation = if @animationDuration is 0 then false else true
+    if enableAnimation
+      @subview("itemView:#{item.cid}").$el.fadeOut(@animationDuration, =>
+        @renderItem item, =>
+          @subview("itemView:#{item.cid}").$el.fadeIn(@animationDuration)
+      )
+    else
+      @renderItem item
+
   # Render and insert all items.
   renderAllItems: =>
     items = @collection.models
@@ -301,7 +318,7 @@ class Mildred.CollectionView extends Mildred.View
     @trigger 'visibilityChange', @visibleItems if items.length is 0
 
   # Instantiate and render an item using the `viewsByCid` hash as a cache.
-  renderItem: (item) ->
+  renderItem: (item, success) ->
     # Get the existing view.
     view = @subview "itemView:#{item.cid}"
 
@@ -313,6 +330,10 @@ class Mildred.CollectionView extends Mildred.View
 
     # Render in any case.
     view.render()
+
+    # Success callback
+    if _.isFunction success
+      success()
 
     view
 
