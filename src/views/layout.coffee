@@ -27,7 +27,6 @@ class Mildred.Layout extends Mildred.View
       skipRouting: '.noscript'
     # Per default, jump to the top of the page.
       scrollTo: [0, 0]
-
     Backbone.on 'adjustTitle', @adjustTitle, this
 
     super
@@ -101,7 +100,7 @@ class Mildred.Layout extends Mildred.View
     skipRouting = @settings.skipRouting
     type = typeof skipRouting
     return if type is 'function' and not skipRouting(href, el) or
-      type is 'string' and $el.is skipRouting
+      type is 'string' and (if $ then $(el).is(skipRouting) else Backbone.utils.matchesSelector el, skipRouting)
 
     # Handle external links.
     external = isAnchor and @isExternalLink el

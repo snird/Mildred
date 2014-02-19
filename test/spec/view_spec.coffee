@@ -560,26 +560,6 @@ describe 'View', ->
       expect(spy1.callCount).to.be 1
       expect(spy2.callCount).to.be 1
 
-  it 'should pass model attributes to the template function', ->
-    setModel()
-
-    sinon.spy(view, 'getTemplateData')
-
-    passedTemplateData = null
-    templateFunc = sinon.stub().returns(template)
-    sinon.stub(view, 'getTemplateFunction').returns(templateFunc)
-
-    view.render()
-
-    expect(view.getTemplateFunction).was.called()
-    expect(view.getTemplateData).was.called()
-    expect(templateFunc).was.called()
-
-    templateData = templateFunc.lastCall.args[0]
-    expect(templateData).to.be.an 'object'
-    expect(templateData.foo).to.be 'foo'
-    expect(templateData.bar).to.be 'bar'
-
   describe 'Disposal', ->
 
     it 'should dispose itself correctly', ->

@@ -294,7 +294,7 @@ class Mildred.View extends Backbone.View
 
   # Returns the compiled template function.
   getTemplateFunction: ->
-    if typeof Mildred.templateFunction is 'function'
+    if _.isFunction Mildred.templateFunction
       return Mildred.templateFunction
     _.template
 

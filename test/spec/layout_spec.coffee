@@ -7,8 +7,10 @@ describe 'Layout', ->
     # Yes, this is ugly. We’re doing it because IE8-10 reports an incorrect
     # protocol if the href attribute is set programatically.
     if attributes.href?
+      if attributes.class?
+        attributes.class += ' go-to'
       div = document.createElement 'div'
-      div.innerHTML = "<a href='#{attributes.href}'>Hello World</a>"
+      div.innerHTML = "<a href='#{attributes.href}' class='go-to'>Hello World</a>"
       link = div.firstChild
       attributes = _.omit attributes, 'href'
       $link = $(link)
@@ -108,18 +110,6 @@ describe 'Layout', ->
     expectWasNotRouted href: 'https://example.com/'
     expect(window.open).was.notCalled()
     window.open = old
-
-  it 'should route clicks on elements with the “go-to” class', ->
-    stub = sinon.stub()
-    Backbone.on 'router:route', stub
-    path = '/internal/link'
-    $span = $(document.createElement 'span')
-    .addClass('go-to').attr('data-href', path)
-    .appendTo(document.body).click().remove()
-    expect(stub).was.calledOnce()
-    passedPath = stub.firstCall.args[0]
-    expect(passedPath).to.eql url: path
-    Backbone.off '!router:route', stub
 
   # With custom external checks
   # ---------------------------
