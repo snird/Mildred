@@ -274,12 +274,11 @@ class Mildred.CollectionView extends Mildred.View
 
   # Updates a specific item view.
   updateItemView: (item) =>
-    enableAnimation = if @animationDuration is 0 then false else true
+    enableAnimation = @animationDuration isnt 0
     if enableAnimation
-      @subview("itemView:#{item.cid}").$el.fadeOut(@animationDuration, =>
+      @subview("itemView:#{item.cid}").$el.fadeOut @animationDuration, =>
         @renderItem item, =>
-          @subview("itemView:#{item.cid}").$el.fadeIn(@animationDuration)
-      )
+          @subview("itemView:#{item.cid}").$el.fadeIn @animationDuration
     else
       @renderItem item
 
