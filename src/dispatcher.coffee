@@ -9,6 +9,7 @@ class Mildred.Dispatcher
   # The current controller, route information, and parameters.
   # The current route object contains the same information as previous.
   currentController: null
+  currentControllerName: null
   currentRoute: null
   currentParams: null
 
@@ -77,9 +78,9 @@ class Mildred.Dispatcher
     if typeof @controllers isnt 'object'
       throw new Error "Dispacher#getControllerByName: the 'controllers' option delivered to the app initialize must be an object."
 
-    for controller_name, controller_function of @controllers
+    for controller_name, controller_object of @controllers
       if @getControllerNameStrip(controller_name) == name.toUpperCase()
-        return controller_function
+        return controller_object
     throw new Error "Dispatcher#getControllerByName: There is no controller named #{name}. Make sure you spelled it right and you pass the controllers array to the App initialize properly."
 
   runController: (controller, route, params, options) ->
@@ -93,23 +94,17 @@ class Mildred.Dispatcher
 
   # Executes controller action.
   executeAction: (controller, route, params, options) ->
-    # Dispose the previous controller.
-    if @currentController
-      # Notify the rest of the world beforehand.
-      Backbone.trigger 'beforeControllerDispose', @currentController
+    if _.isNull(@currentController)
+      @currentController = controller
+      @currentControllerName = route.controller
 
-      # Passing new parameters that the action method will receive.
-      @currentController.dispose params, route, options
-
-    # Save the new controller and its parameters.
-    @currentController = controller
     @currentParams = params
 
     # Call the controller action with params and options.
-    controller[route.action] params, route, options
+    @currentController[route.action] params, route, options
 
     # Stop if the action triggered a redirect.
-    return if controller.redirected
+    return if @currentController.redirected
 
     # Adjust the URL.
     @adjustURL route, params, options
@@ -120,6 +115,21 @@ class Mildred.Dispatcher
 
   # Executes before action filterer.
   executeBeforeAction: (controller, route, params, options) ->
+    # Dispose the previous controller, if it's not the same controller.
+    if not _.isNull(@currentController) and @currentControllerName isnt route.controller
+      # Notify the rest of the world beforehand.
+      Backbone.trigger 'beforeControllerDispose', @currentController
+
+      # Passing new parameters that the action method will receive.
+      @currentController.dispose params, route, options
+
+      # Save the new controller and its parameters.
+      @currentController = controller
+      @currentControllerName = route.controller
+    else if not _.isNull(@currentController) and @currentControllerName is route.controller
+      # if the controller hasn't changed, use the same controller instance.
+      controller = @currentController
+
     before = controller.beforeAction
 
     executeAction = =>

@@ -350,9 +350,12 @@ class Mildred.View extends Backbone.View
       # Unbind all referenced handlers.
       @stopListening()
     else
-      # Remove the topmost element from DOM. This also removes all event
-      # handlers from the element and all its children.
-      @remove()
+      if @container
+        $(@container).empty()
+      else
+        # Remove the topmost element from DOM. This also removes all event
+        # handlers from the element and all its children.
+        @remove()
 
     # Remove element references, options,
     # model/collection references and subview lists.
