@@ -333,6 +333,7 @@ class Mildred.CollectionView extends Mildred.View
     # Success callback
     if _.isFunction success
       success()
+    @trigger 'itemUpdated', item
 
     view
 
