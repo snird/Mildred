@@ -97,6 +97,13 @@ class Mildred.View extends Backbone.View
       @listenTo @collection, 'dispose', (subject) =>
         @dispose() if not subject or subject is @collection
 
+		# Wrap render method with after and before callbacks
+		@render = _.wrap(@render, (render) =>
+			@beforeRender()
+			render()
+			@afterRender()
+		)
+
     # Render automatically if set by options or instance property.
     @render() if @autoRender
 
@@ -319,6 +326,12 @@ class Mildred.View extends Backbone.View
 
     # Return the view.
     this
+
+	# Default void callbacks for before and after rendering
+	# The key different between `afterRender` to `attach` method is attach 
+	# executed only once after initializing the view and not after each render.
+	beforeRender: ->
+	afterRender: ->
 
   # This method is called after a specific `render` of a derived class.
   attach: ->
